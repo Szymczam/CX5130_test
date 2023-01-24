@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="U_Convert" Id="{135bad39-a65a-4041-aed8-a9b22fd39e15}" SpecialFunc="None">
+    <Declaration><![CDATA[TYPE U_Convert :  
+	UNION  
+		arrUDP_Data: ARRAY [0 .. 3] OF BYTE; // Array must start with LSB  
+		rReal : REAL;  
+	END_UNION  
+END_TYPE ]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <LineIds Name="U_Convert">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
