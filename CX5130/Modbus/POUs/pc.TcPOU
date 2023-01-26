@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="pc" Id="{9a667e12-d04b-4b4e-a638-8e70870ae09e}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM pc
+VAR
+	cnt: INT;
+	
+
+ 	//modbus
+	MBReadRegs	: FB_MBReadRegs;
+	fRealValude : REAL;
+	MBReadArray	: ARRAY [0..4*4-1] OF BYTE;
+	MBExecute	: BOOL;
+	
+	uConvert	: U_Convert;
+	MB_i		: INT;
+	MBRegs	 	: ARRAY [0..4-1] OF REAL;
+	
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[cnt := cnt + 1;	
+
+IF cnt >= 100 THEN
+	cnt := 0;
+END_IF
+
+IF cnt <= 50 THEN	MBExecute := 1;	
+ELSE 				MBExecute := 0;	
+END_IF
+
+MBReadRegs(
+	sIPAddr:= '192.168.0.10',
+	nTCPPort:= 504,
+	nUnitID:= 16#FF,  
+	nQuantity:= 2*4, 
+	nMBAddr:= 0, 
+	cbLength:= SIZEOF(MBReadArray), 
+	pDestAddr:= ADR(MBReadArray),  
+	bExecute:= MBExecute, 
+	tTimeout:= T#1S, 
+	bBusy=> , 
+	bError=> , 
+	nErrId=> , 
+	cbRead=> ,
+);
+
+FOR MB_i:=1 TO 4 BY 1 DO
+	//BYTE t o REAL
+	uConvert.arrUDP_Data[0] := MBReadArray[2+4*MB_i-4]; // LSB
+	uConvert.arrUDP_Data[1] := MBReadArray[3+4*MB_i-4];
+	uConvert.arrUDP_Data[2] := MBReadArray[0+4*MB_i-4];
+	uConvert.arrUDP_Data[3] := MBReadArray[1+4*MB_i-4]; // MSB
+	MBRegs[MB_i-1] := uConvert.rReal;
+END_FOR;
+
+
+]]></ST>
+    </Implementation>
+    <LineIds Name="pc">
+      <LineId Id="46" Count="35" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
